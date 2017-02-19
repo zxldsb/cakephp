@@ -19,8 +19,22 @@ use Cake\Database\Expression\Comparison;
 use Cake\Database\Expression\QueryExpression;
 use Cake\Event\Event;
 use Cake\I18n\Time;
+use Cake\ORM\Table;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
+
+class CategoriesTable extends Table
+{
+
+    public function initialize(array $config = [])
+    {
+        $this->table('categories');
+        $this->belongsTo('ParentCategories', [
+            'className' => __CLASS__,
+            'foreignKey' => 'parent_id'
+        ]);
+    }
+}
 
 /**
  * Contains regression test for the Query builder
@@ -44,7 +58,8 @@ class QueryRegressionTest extends TestCase
         'core.special_tags',
         'core.tags_translations',
         'core.translates',
-        'core.users'
+        'core.users',
+        'core.categories'
     ];
 
     public $autoFixtures = false;
@@ -1560,5 +1575,25 @@ class QueryRegressionTest extends TestCase
         ];
 
         $this->assertEquals($expected, $result);
+    }
+
+    public function testNoMemoryLeak()
+    {
+        $this->loadFixtures('Categories');
+        $table = TableRegistry::get('Categories', [
+            'className' => CategoriesTable::class
+        ]);
+
+        for ($i = 0; $i < 6001; ++$i) {
+            $table->find()
+                ->contain('ParentCategories.ParentCategories')
+                ->first();
+
+            if ($i % 1000 === 0) {
+                printf("%d: %f\n", $i, memory_get_usage() / 1024 / 1024 );
+            }
+        }
+
+
     }
 }
