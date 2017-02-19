@@ -1584,7 +1584,7 @@ class QueryRegressionTest extends TestCase
             'className' => CategoriesTable::class
         ]);
 
-        for ($i = 0; $i < 6001; ++$i) {
+        for ($i = 0; $i < 20001; ++$i) {
             $table->find()
                 ->contain('ParentCategories.ParentCategories')
                 ->first();
