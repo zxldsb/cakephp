@@ -315,7 +315,7 @@ class ValidatorTest extends TestCase
     {
         $validator = new Validator();
         $require = true;
-        $validator->requirePresence('title', function ($context) use (&$require) {
+        $validator->requirePresence('title', function (array $context) use (&$require) {
             $this->assertEquals([], $context['data']);
             $this->assertEquals([], $context['providers']);
             $this->assertEquals('title', $context['field']);
@@ -843,7 +843,7 @@ class ValidatorTest extends TestCase
     {
         $validator = new Validator();
         $allow = true;
-        $validator->allowEmpty('title', function ($context) use (&$allow) {
+        $validator->allowEmpty('title', function (array $context) use (&$allow) {
             $this->assertEquals([], $context['data']);
             $this->assertEquals([], $context['providers']);
             $this->assertTrue($context['newRecord']);
@@ -865,7 +865,7 @@ class ValidatorTest extends TestCase
     {
         $validator = new Validator();
         $prevent = true;
-        $validator->notEmpty('title', 'error message', function ($context) use (&$prevent) {
+        $validator->notEmpty('title', 'error message', function (array $context) use (&$prevent) {
             $this->assertEquals([], $context['data']);
             $this->assertEquals([], $context['providers']);
             $this->assertFalse($context['newRecord']);
@@ -1053,7 +1053,7 @@ class ValidatorTest extends TestCase
             ->setMethods(['isCool'])
             ->getMock();
         $thing->expects($this->once())->method('isCool')
-            ->will($this->returnCallback(function ($data, $context) use ($thing) {
+            ->will($this->returnCallback(function ($data, array $context) use ($thing) {
                 $this->assertEquals('bar', $data);
                 $expected = [
                     'default' => new \Cake\Validation\RulesProvider,
@@ -1100,7 +1100,7 @@ class ValidatorTest extends TestCase
             ->setMethods(['isCool'])
             ->getMock();
         $thing->expects($this->once())->method('isCool')
-            ->will($this->returnCallback(function (array $data, array $context, $a, $b) use ($thing) {
+            ->will($this->returnCallback(function ($data, array $context, $a, $b) use ($thing) {
                 $this->assertEquals('bar', $data);
                 $this->assertEquals('and', $a);
                 $this->assertEquals('awesome', $b);
@@ -1138,7 +1138,7 @@ class ValidatorTest extends TestCase
     {
         $validator = new Validator();
         $validator->add('name', 'myRule', [
-            'rule' => function (array $data, array $context, $provider) {
+            'rule' => function ($data, array $context, $provider) {
                 $this->assertEquals('foo', $data);
 
                 return 'You fail';
