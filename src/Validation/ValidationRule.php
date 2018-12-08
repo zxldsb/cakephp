@@ -104,6 +104,7 @@ class ValidationRule
      * - newRecord: (boolean) whether or not the data to be validated belongs to a
      *   new record
      * - data: The full data that was passed to the validation process
+     * - pass: Additional data passed from the validation rule configuration.
      * - field: The name of the field that is being processed
      * @return bool|string
      * @throws \InvalidArgumentException when the supplied rule is not a valid
@@ -111,7 +112,9 @@ class ValidationRule
      */
     public function process($value, array $providers, array $context = [])
     {
-        $context += ['data' => [], 'newRecord' => true, 'providers' => $providers];
+        $context += [
+            'data' => [], 'newRecord' => true, 'providers' => $providers, 'pass' => [],
+        ];
 
         if ($this->_skip($context)) {
             return true;
@@ -134,7 +137,8 @@ class ValidationRule
         }
 
         if ($this->_pass) {
-            $args = array_values(array_merge([$value], $this->_pass, [$context]));
+            $context['pass'] = $this->_pass;
+            $args = array_values(array_merge([$value, $context], $this->_pass));
             $result = $callable(...$args);
         } else {
             $result = $callable($value, $context);

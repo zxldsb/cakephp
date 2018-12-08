@@ -1066,7 +1066,8 @@ class ValidatorTest extends TestCase
                         'email' => '!',
                         'title' => 'bar'
                     ],
-                    'field' => 'title'
+                    'field' => 'title',
+                    'pass' => [],
                 ];
                 $this->assertEquals($expected, $context);
 
@@ -1099,7 +1100,7 @@ class ValidatorTest extends TestCase
             ->setMethods(['isCool'])
             ->getMock();
         $thing->expects($this->once())->method('isCool')
-            ->will($this->returnCallback(function ($data, $a, $b, $context) use ($thing) {
+            ->will($this->returnCallback(function (array $data, array $context, $a, $b) use ($thing) {
                 $this->assertEquals('bar', $data);
                 $this->assertEquals('and', $a);
                 $this->assertEquals('awesome', $b);
@@ -1137,7 +1138,7 @@ class ValidatorTest extends TestCase
     {
         $validator = new Validator();
         $validator->add('name', 'myRule', [
-            'rule' => function ($data, $provider) {
+            'rule' => function (array $data, array $context, $provider) {
                 $this->assertEquals('foo', $data);
 
                 return 'You fail';
