@@ -6505,4 +6505,36 @@ class TableTest extends TestCase
             'SQLServer does not support the requirements of this test.'
         );
     }
+
+    /**
+     * Check that the list result is correct when using associated data
+     *
+     * @link https://github.com/cakephp/cakephp/issues/12880
+     * @return void
+     */
+    public function testFindListDistinctIdsOnAssociatedData()
+    {
+        $table = new Table([
+            'table' => 'comments',
+            'connection' => $this->connection,
+        ]);
+        $table->belongsTo('Articles');
+
+        $query = $table->find()
+            ->contain([
+                'Articles'
+            ])
+            ->select('Articles.author_id')
+            ->distinct('Articles.author_id')
+            ->where(function ($exp) {
+                return $exp->isNotNull('Articles.author_id');
+            })
+            ->find('list', [
+                'keyField' => 'Articles.author_id',
+                'valueField' => 'Articles.author_id',
+            ]);
+
+        $results = $query->toArray();
+        $this->assertEquals([1 => 1, 3 => 3], $results);
+    }
 }
